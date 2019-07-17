@@ -14,9 +14,13 @@ const pythonBin string = "C:\\msys64\\usr\\bin\\python.exe"
 const ansiblePlaybookBin string = "C:\\msys64\\usr\\bin\\ansible-playbook"
 
 var opts struct {
-	ExtraVars []string `short:"e" long:"extra-vars" description:"extra vars"`
-	Inventory string   `short:"i" long:"inventory" description:"inventory"`
-	Version   bool     `long:"version" description:"version"`
+	ExtraVars   []string `short:"e" long:"extra-vars" description:"extra vars"`
+	Inventory   string   `short:"i" long:"inventory" description:"inventory"`
+	Version     bool     `long:"version" description:"version"`
+	SkipTags    []string `long:"skip-tags" description:"skip tags"`
+	StartAtTask string   `long:"start-at-task" description:"start at task"`
+	Step        bool     `long:"step" description:"step"`
+	Tags        []string `short:"t" long:"tags" description:"tags"`
 }
 
 func main() {
@@ -48,6 +52,19 @@ func main() {
 
 	if opts.Version {
 		pythonArgs = append(pythonArgs, "--version")
+	}
+
+	for _, skipTag := range opts.SkipTags {
+		pythonArgs = append(pythonArgs, "--skip-tags", fmt.Sprintf("'%s'", skipTag))
+	}
+	if opts.StartAtTask != "" {
+		pythonArgs = append(pythonArgs, "--start-at-task="+opts.StartAtTask)
+	}
+	if opts.Step {
+		pythonArgs = append(pythonArgs, "--step")
+	}
+	for _, tag := range opts.Tags {
+		pythonArgs = append(pythonArgs, "--tags", fmt.Sprintf("'%s'", tag))
 	}
 
 	fmt.Printf("args: %v\n", pythonArgs)
